@@ -1,6 +1,6 @@
 # sv-association-pipeline
 
-An end-to-end, script-based pipeline for **structural variant (SV) association analysis**, designed to reproduce paper results and to serve as a general template for SV studies across species. The workflow supports:
+An end-to-end, script-based pipeline for **structural variant (SV) association analysis**, designed to reproduce paper results and to serve as a general template for SV studies across species. The pipeline covers three major steps: genome-wide association studies (GWAS), statistical fine-mapping, and functional enrichment analysis of imputed SVs combined with SNPs.
 
 ## Overview
 
