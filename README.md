@@ -135,7 +135,6 @@ devtools::install_github("jiang18/gemrich")
 | `data/genotypes/grm_list.txt` | Text | List of partitioned GRM paths for MPH |
 | `data/phenotypes/<trait>.csv` | CSV | Per-trait phenotype file (one animal per row) |
 | `data/covariates.csv` | CSV | Shared covariates (e.g., intercept, batch effects) |
-| `data/varcomp/<trait>.varcomp.csv` | CSV | Variance component estimates for each trait |
 
 ### Phenotype file format
 ```
