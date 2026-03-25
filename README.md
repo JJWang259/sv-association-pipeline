@@ -284,10 +284,10 @@ This pipeline was developed for and used in the following studies. If you find i
 
 Please also cite the underlying tools:
 
-- **SLEMM:** Jiang J, et al. (2023). *Bioinformatics*, 39(4). https://doi.org/10.1093/bioinformatics/btad127
-- **BFMAP:** Jiang J, Cole JB, Freebern E, et al. (2019). *Communications Biology*, 2, 212. https://doi.org/10.1038/s42003-019-0454-y
-- **MPH:** Jiang J, et al. (2024). *Bioinformatics*, 40(5). https://doi.org/10.1093/bioinformatics/btae298
-- **GEMRICH:** Jiang J, et al. https://github.com/jiang18/gemrich
+- **SLEMM:** Cheng J, et al. (2023). *Bioinformatics*, 39(4). https://doi.org/10.1093/bioinformatics/btad127
+- **BFMAP:** Jiang J, et al. (2019). *Communications Biology*, 2, 212. https://doi.org/10.1038/s42003-019-0454-y
+- **MPH:** Jiang J. (2024). *Bioinformatics*, 40(5). https://doi.org/10.1093/bioinformatics/btae298
+- **GEMRICH:** Jiang J. https://github.com/jiang18/gemrich
 - **PLINK:** Chang CC, et al. (2015). *GigaScience*, 4(1). https://doi.org/10.1186/s13742-015-0047-8
 
 ---
