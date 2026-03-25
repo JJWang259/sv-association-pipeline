@@ -275,16 +275,21 @@ The GRM list (`data/genotypes/grm_list.txt`) should point to partitioned GRMs co
 
 ## Citation
 
-If you use this pipeline, please cite:
+This pipeline was developed for and used in the following studies. If you find it helpful, please consider citing the relevant paper(s):
 
-**Yang L†, Wang J†, Kuhn K, Li W, Zanton G, Neupane M, Boschiero C, Cole JB, Li B, Li C, Baldwin RL VI, Van Tassell CP, Rosen BD, Smith TPL, Jiang J\*, Fang L\*, Ma L\*, Liu GE\*.** An enhanced pangenome reference panel enables accurate imputation of structural variation and large-scale genotype-phenotype analyses in dairy cattle. *(under review)*
+- **Yang L†, Wang J†, Kuhn K, Li W, Zanton G, Neupane M, Boschiero C, Cole JB, Li B, Li C, Baldwin RL VI, Van Tassell CP, Rosen BD, Smith TPL, Jiang J\*, Fang L\*, Ma L\*, Liu GE\*.** An enhanced pangenome reference panel enables accurate imputation of structural variation and large-scale genotype-phenotype analyses in dairy cattle. *(under review)*
+
+- **[Authors].** Long-read sequencing reveals the impact of structural variation on gene expression and complex traits in pigs. *(citation)*
+
+- **[Authors].** An integrated multi-tissue atlas of epigenomic landscapes and regulatory elements in the bovine genome. *(citation)*
 
 Please also cite the underlying tools:
 
-- **SLEMM:** Jiang J, et al. (2023). *Genetics*, 224(1). https://doi.org/10.1093/genetics/iyad014
-- **BFMAP:** Jiang J, et al. https://github.com/jiang18/bfmap
-- **MPH / GEMRICH:** Jiang J, et al. https://github.com/jiang18/mph | https://github.com/jiang18/gemrich
-- **PLINK 1.9/2:** Chang CC, et al. (2015). *GigaScience*, 4(1). https://doi.org/10.1186/s13742-015-0047-8
+- **SLEMM:** Jiang J, et al. (2023). *Bioinformatics*, 39(4). https://doi.org/10.1093/bioinformatics/btad127
+- **BFMAP:** Jiang J, Cole JB, Freebern E, et al. (2019). *Communications Biology*, 2, 212. https://doi.org/10.1038/s42003-019-0454-y
+- **MPH:** Jiang J, et al. (2024). *Bioinformatics*, 40(5). https://doi.org/10.1093/bioinformatics/btae298
+- **GEMRICH:** Jiang J, et al. https://github.com/jiang18/gemrich
+- **PLINK:** Chang CC, et al. (2015). *GigaScience*, 4(1). https://doi.org/10.1186/s13742-015-0047-8
 
 ---
 
