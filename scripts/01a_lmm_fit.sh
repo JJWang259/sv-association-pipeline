@@ -17,7 +17,7 @@ TRAIT="MilkYield"                        # Trait name (must match column header 
 BFILE="/path_to_the_file/geno"           # Genotype file (PLINK binary prefix, SNPs only, QC-filtered)
 PHENO_FILE="/path_to_the_file/${TRAIT}.csv"  # Phenotype file: must contain columns IID and <trait>
 SNP_INFO="/path_to_the_file/snp.info.csv"    # SNP info file for SLEMM variance component estimation
-OUT_PREFIX="path_to_the_file/${TRAIT}"  # Output file prefix (SLEMM appends .qs, .log, etc.)
+OUT_PREFIX="/path_to_the_file/${TRAIT}"  # Output file prefix (SLEMM appends .qs, .log, etc.)
 
 # Compute settings
 NUM_THREADS=20
