@@ -11,7 +11,6 @@ The pipeline covers three steps: **genome-wide association studies (GWAS)**, **B
 - [Overview](#overview)
 - [Repository Structure](#repository-structure)
 - [Dependencies](#dependencies)
-- [Installation](#installation)
 - [Input Data](#input-data)
 - [Pipeline Steps](#pipeline-steps)
   - [Step 1: GWAS with SLEMM](#step-1-gwas-with-slemm)
@@ -26,7 +25,7 @@ The pipeline covers three steps: **genome-wide association studies (GWAS)**, **B
 ## Overview
 
 ```
-Imputed SVs + SNPs  (PLINK binary format)
+Genotypes (SNPs / SVs, PLINK binary)
          │
          ▼
 ┌──────────────────────┐
@@ -36,13 +35,13 @@ Imputed SVs + SNPs  (PLINK binary format)
           │
           ▼
 ┌──────────────────────┐
-│  Step 1b             │  slemm_gwa (per chromosome)
-│  Association scan    │  Genome-wide SV-trait association statistics
+│  Step 1b             │  slemm_gwa
+│  Association scan    │  Genome-wide association statistics
 └─────────┬────────────┘
           │
           ▼
 ┌──────────────────────┐
-│  Step 2a             │  R: data.table
+│  Step 2a             │  R: identify_candidate_regions.R
 │  Candidate regions   │  Define fine-mapping windows from GWAS hits
 └─────────┬────────────┘
           │
@@ -54,21 +53,19 @@ Imputed SVs + SNPs  (PLINK binary format)
           │
           ▼
 ┌──────────────────────┐
-│  Step 2c             │  R: data.table
+│  Step 2c             │  R: summarise_finemapping.R 
 │  Summarise results   │  Aggregate PIPs across all traits and signals
 └─────────┬────────────┘
           │
-          ▼
-┌──────────────────────┐
-│  Step 3a             │  R + plink
-│  Prepare covariates  │  Fine-mapped lead variants as fixed effects for MPH
-└─────────┬────────────┘
-          │
-          ▼
-┌──────────────────────┐
-│  Step 3b             │  MPH --minque
-│  Enrichment (MPH)    │  Variance partitioning across functional annotations
-└──────────────────────┘
+          ├─────────────────────────────────────┐
+          ▼                                     ▼
+┌──────────────────────┐           ┌──────────────────────┐
+│  Step 3a + 3b        │           │  Step 3c             │
+│  MPH MINQUE          │           │  GEMRICH             │
+│  Polygenic variance  │           │  Large-effect MLE    │
+│  partitioning across │           │  enrichment of fine- │
+│  annotation bins     │           │  mapped signals      │
+└──────────────────────┘           └──────────────────────┘
 ```
 
 ---
@@ -76,27 +73,32 @@ Imputed SVs + SNPs  (PLINK binary format)
 ## Repository Structure
 
 ```
-sv-association-pipeline/
+genomics-association-pipeline/
 ├── README.md
 ├── config/
-│   └── traits.csv                    # Trait list (trait, N, mean, sd)
+│   └── traits.csv                        # Trait list (trait, N, mean, sd)
 ├── data/
-│   ├── genotypes/                    # PLINK binary files (.bed/.bim/.fam)
-│   ├── phenotypes/                   # Per-trait phenotype CSVs
-│   ├── covariates.csv                # Shared covariate file
-│   └── varcomp/                      # Per-trait variance component estimates
+│   ├── genotypes/                        # PLINK binary files (.bed/.bim/.fam)
+│   ├── phenotypes/                       # Per-trait phenotype CSVs
+│   ├── annotations/                      # SNP x annotation matrix (snpinfo.csv)
+│   ├── covariates.csv                    # Shared covariate file
+│   └── varcomp/                          # Per-trait variance component estimates
 ├── scripts/
-│   ├── 01a_lmm_fit.sh                # Step 1a: LMM model fitting (SLEMM)
-│   ├── 01b_gwas_association.sh       # Step 1b: Chromosome-wise GWAS scan
+│   ├── 01a_lmm_fit.sh                    # Step 1a: LMM model fitting (SLEMM)
+│   ├── 01b_gwas_association.sh           # Step 1b: Chromosome-wise GWAS scan
 │   ├── 02a_identify_candidate_regions.R  # Step 2a: Define candidate regions
-│   ├── 02b_finemapping_bfmap.R       # Step 2b: BFMAP fine-mapping per trait
-│   ├── 02c_summarise_finemapping.R   # Step 2c: Aggregate fine-mapping results
-│   ├── 03a_prepare_mph_covariates.R  # Step 3a: Extract lead-SNP covariates
-│   └── 03b_run_mph.sh                # Step 3b: MPH MINQUE enrichment analysis
+│   ├── 02b_finemapping_bfmap.R           # Step 2b: BFMAP fine-mapping per trait
+│   ├── 02c_summarise_finemapping.R       # Step 2c: Aggregate fine-mapping results
+│   ├── 03a_prepare_mph_covariates.R      # Step 3a: Extract lead-SNP covariates
+│   ├── 03b_run_mph.sh                    # Step 3b: MPH MINQUE enrichment
+│   └── 03c_gemrich_enrichment.R          # Step 3c: GEMRICH large-effect enrichment
 └── results/
-    ├── gwas/                         # Per-trait GWAS summary statistics
-    ├── finemapping/                  # Per-region BFMAP output and PIP tables
-    └── enrichment/                   # MPH variance components and enrichment
+    ├── gwas/                             # Per-trait GWAS summary statistics
+    ├── finemapping/                      # Per-region BFMAP output and PIP tables
+    └── enrichment/
+        ├── covariates/                   # Lead-SNP covariate files for MPH
+        ├── mph/                          # MPH variance component estimates
+        └── gemrich/                      # GEMRICH enrichment results
 ```
 
 ---
@@ -107,49 +109,21 @@ sv-association-pipeline/
 
 | Tool | Version | Purpose | Link |
 |------|---------|---------|------|
-| SLEMM | ≥ 0.93 | LMM fitting and GWAS | [jiang18/slemm](https://github.com/jiang18/slemm) |
+| SLEMM | any | GWAS | [jiang18/slemm](https://github.com/jiang18/slemm) |
 | BFMAP | ≥ 0.65 | Bayesian fine-mapping | [jiang18/bfmap](https://github.com/jiang18/bfmap) |
-| MPH | latest | Variance partitioning and enrichment | [jiang18/mph](https://github.com/jiang18/mph) |
-| PLINK 1.9 | ≥ 1.90 | Genotype extraction (`--recodeA`) | [plink 1.9](https://www.cog-genomics.org/plink/) |
-| PLINK 2 | ≥ 2.0 | Genotype extraction (`--make-bed`) | [plink 2](https://www.cog-genomics.org/plink/2.0/) |
+| MPH | any | Polygenic variance partitioning | [jiang18/mph](https://github.com/jiang18/mph) |
+| GEMRICH | any | Large-effect enrichment analysis | [jiang18/gemrich](https://github.com/jiang18/gemrich) |
+| PLINK | any | Genotype data processing | [cog-genomics.org/plink](https://www.cog-genomics.org/plink/) |
 | R | ≥ 4.1 | Data processing and scripting | [r-project.org](https://www.r-project.org) |
-| Bash | ≥ 4.0 | Shell scripting | — |
 
 ### R Packages
 
 ```r
-install.packages("data.table")
+install.packages(c("data.table", "parallel"))
+
+# GEMRICH (install from GitHub)
+devtools::install_github("jiang18/gemrich")
 ```
-
----
-
-## Installation
-
-Clone this repository:
-
-```bash
-git clone https://github.com/JJWang259/sv-association-pipeline.git
-cd sv-association-pipeline
-```
-
-Place (or symlink) the SLEMM, BFMAP, and MPH executables in `bin/`:
-
-```bash
-mkdir -p bin
-cp /path/to/slemm   bin/slemm
-cp /path/to/slemm_gwa bin/slemm_gwa
-cp /path/to/bfmap   bin/bfmap
-cp /path/to/mph     bin/mph
-```
-
-Alternatively, ensure they are available in your `$PATH` and update the `SLEMM`, `SLEMM_GWA`, `BFMAP`, and `MPH` variables at the top of each script.
-
-Make shell scripts executable:
-
-```bash
-chmod +x scripts/*.sh
-```
-
 ---
 
 ## Input Data
@@ -175,12 +149,15 @@ HO123456,0.312
 HO123457,1.120
 ```
 
-### Trait list format (`config/traits.csv`)
+
+### Annotation file format (`data/annotations/snpinfo.csv`)
+
+One row per SNP, one column per annotation category. Cell values are category labels.
 
 ```
-trait,N,mean,sd
-MilkYield,50299,0.00,1.00
-FatYield,50299,0.00,1.00
+SNP,V1,V2,V3,...
+rs123,1,0,1,...
+rs456,0,1,0,...
 ```
 
 ---
