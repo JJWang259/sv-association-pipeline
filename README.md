@@ -75,14 +75,11 @@ Genotypes (SNPs / SVs, PLINK binary)
 ```
 genomics-association-pipeline/
 ├── README.md
-├── config/
-│   └── traits.csv                        # Trait list (trait, N, mean, sd)
 ├── data/
 │   ├── genotypes/                        # PLINK binary files (.bed/.bim/.fam)
 │   ├── phenotypes/                       # Per-trait phenotype CSVs
-│   ├── annotations/                      # SNP x annotation matrix (snpinfo.csv)
-│   ├── covariates.csv                    # Shared covariate file
-│   └── varcomp/                          # Per-trait variance component estimates
+│   ├── annotations/                      # Functional annotation matrix (snpinfo.csv)
+│   └── covariates.csv                    # Shared covariate file
 ├── scripts/
 │   ├── 01a_lmm_fit.sh                    # Step 1a: LMM model fitting (SLEMM)
 │   ├── 01b_gwas_association.sh           # Step 1b: Chromosome-wise GWAS scan
@@ -90,7 +87,7 @@ genomics-association-pipeline/
 │   ├── 02b_finemapping_bfmap.R           # Step 2b: BFMAP fine-mapping per trait
 │   ├── 02c_summarise_finemapping.R       # Step 2c: Aggregate fine-mapping results
 │   ├── 03a_prepare_mph_covariates.R      # Step 3a: Extract lead-SNP covariates
-│   ├── 03b_run_mph.sh                    # Step 3b: MPH MINQUE enrichment
+│   ├── 03b_run_mph.sh                    # Step 3b: MPH enrichment
 │   └── 03c_gemrich_enrichment.R          # Step 3c: GEMRICH large-effect enrichment
 └── results/
     ├── gwas/                             # Per-trait GWAS summary statistics
@@ -132,22 +129,23 @@ devtools::install_github("jiang18/gemrich")
 
 | File | Format | Description |
 |------|--------|-------------|
-| `config/traits.csv` | CSV | Trait list with columns: `trait, N, mean, sd` |
-| `data/genotypes/geno_qc.*` | PLINK binary | Quality-controlled SNP genotypes for LMM fitting |
-| `data/genotypes/geno_sv_snp.*` | PLINK binary | Merged SNP + imputed SV genotypes for GWAS and fine-mapping |
-| `data/genotypes/grm_10k.*` | Binary GRM | Genomic relationship matrix for BFMAP (computed from ~10k markers) |
+| `data/genotypes/geno_model.*` | PLINK binary | Model SNP genotypes for LMM fitting |
+| `data/genotypes/geno_tests.*` | PLINK binary | Genotypes for GWAS and fine-mapping |
+| `data/genotypes/grm.*` | Binary GRM | Genomic relationship matrix for BFMAP (computed from model SNPs) |
 | `data/genotypes/grm_list.txt` | Text | List of partitioned GRM paths for MPH |
 | `data/phenotypes/<trait>.csv` | CSV | Per-trait phenotype file (one animal per row) |
 | `data/covariates.csv` | CSV | Shared covariates (e.g., intercept, batch effects) |
 | `data/varcomp/<trait>.varcomp.csv` | CSV | Variance component estimates for each trait |
 
 ### Phenotype file format
+```
+IID,<trait>[,<reliability>]
+HO123456,0.312,0.85
+HO123457,1.120,0.91
+```
 
-```
-IID,<trait>
-HO123456,0.312
-HO123457,1.120
-```
+The reliability column is optional. If included, specify its column name in
+`ERROR_WEIGHT_NAME` in `01a_lmm_fit.sh`.
 
 
 ### Annotation file format (`data/annotations/snpinfo.csv`)
@@ -166,7 +164,7 @@ rs456,0,1,0,...
 
 ### Step 1: GWAS with SLEMM
 
-GWAS is run in two substeps. First, a linear mixed model (LMM) is fit per trait to estimate variance components and compute the genomic relationship structure (`01a`). The fitted model is then used to run a chromosome-wise association scan across all variants (`01b`), with results concatenated into a single per-trait file.
+GWAS is run in two substeps. First, a linear mixed model (LMM) is fit per trait to estimate variance components and compute the genomic relationship structure (`01a`). The fitted model is then used to run genome-wide association tests (`01b`), with results concatenated into a single per-trait file.
 
 **Edit paths** at the top of each script (working directory, bfile prefix, phenotype directory, executable paths, number of threads, number of chromosomes).
 
@@ -178,21 +176,8 @@ bash scripts/01a_lmm_fit.sh
 bash scripts/01b_gwas_association.sh
 ```
 
-**Key parameters in `01a_lmm_fit.sh`:**
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `NUM_THREADS` | 20 | CPU threads for SLEMM |
-| `MIN_MAF` | 0.01 | Minimum minor allele frequency |
-| `MIN_HWE_PVAL` | 1e-9 | Hardy-Weinberg equilibrium filter |
-| `NUM_QF_MARKERS` | 90 | Number of QF markers for SLEMM |
-
-**Key parameters in `01b_gwas_association.sh`:**
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `NUM_CHROMOSOMES` | 29 | Number of autosomes (29 cattle, 18 pig) |
-| `OMP_NUM_THREADS` | 10 | OpenMP threads for slemm_gwa |
+For a full description of SLEMM parameters, see the
+[SLEMM documentation](https://github.com/jiang18/slemm).
 
 **Output:** `results/gwas/<trait>_GWAS_All.txt` — genome-wide association statistics (columns: CHROM, POS, ID, REF, ALT, CHISQ, P, etc.)
 
