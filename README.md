@@ -272,7 +272,7 @@ The GRM list (`data/genotypes/grm_list.txt`) should point to partitioned GRMs co
 
 ---
 
-## Citation
+## Publications
 
 This pipeline was developed for and used in the following studies. If you find it helpful, please consider citing the relevant paper(s):
 
