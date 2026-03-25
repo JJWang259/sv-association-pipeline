@@ -1,7 +1,7 @@
 # Identify fine-mapping candidate regions from GWAS summary statistics
 # Dependencies: data.table
 # Author: Junjian Wang
-# Initiate date: 03/24/2026
+# Initiate date: 02/12/2026
 # Current date: 03/24/2026
 # =============================================================================
 
