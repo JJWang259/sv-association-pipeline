@@ -163,7 +163,7 @@ rs456,0,1,0,...
 
 ### Step 1: GWAS with SLEMM
 
-GWAS is run in two substeps. First, a linear mixed model (LMM) is fit per trait to estimate variance components and compute the genomic relationship structure (`01a`). The fitted model is then used to run genome-wide association tests (`01b`), with results concatenated into a single per-trait file.
+GWAS is run in two substeps. First, a linear mixed model (LMM) is fit per trait to estimate variance components (`01a`). The fitted model is then used to run genome-wide association tests (`01b`), with results concatenated into a single per-trait file.
 
 **Edit paths** at the top of each script (working directory, bfile prefix, phenotype directory, executable paths, number of threads, number of chromosomes).
 
