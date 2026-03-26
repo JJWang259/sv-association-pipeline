@@ -184,13 +184,13 @@ For a full description of SLEMM parameters, see the
 
 ### Step 2: Fine-Mapping with BFMAP
 
-Candidate genomic regions are defined from GWAS hits, then submitted to BFMAP for Bayesian fine-mapping. Results are aggregated across all traits into a single summary table.
+Candidate genomic regions are defined from GWAS hits and analyzed with BFMAP for Bayesian fine-mapping.
 
 **Edit paths** at the top of each R script.
 
 ```bash
-# Step 2a — Define candidate regions from GWAS (all traits)
-Rscript scripts/02a_identify_candidate_regions.R
+# Step 2a — Define candidate regions from GWAS 
+Rscript 02a_identify_candidate_regions.R
 
 # Step 2b — Run BFMAP fine-mapping (one trait at a time, parallelise as needed)
 Rscript scripts/02b_finemapping_bfmap.R MilkYield
