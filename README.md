@@ -129,9 +129,8 @@ devtools::install_github("jiang18/gemrich")
 
 | File | Format | Description |
 |------|--------|-------------|
-| `data/genotypes/geno_model.*` | PLINK binary | Model SNP genotypes for LMM fitting |
-| `data/genotypes/geno_tests.*` | PLINK binary | Genotypes for GWAS and fine-mapping |
-| `data/genotypes/grm.*` | Binary GRM | Genomic relationship matrix for BFMAP (computed from model SNPs) |
+| `data/genotypes/geno_model.*` | PLINK binary | Model SNP genotypes for LMM fitting and GRM construction |
+| `data/genotypes/geno_test.*` | PLINK binary | Genotypes for association testing and fine-mapping |
 | `data/genotypes/grm_list.txt` | Text | List of partitioned GRM paths for MPH |
 | `data/phenotypes/<trait>.csv` | CSV | Per-trait phenotype file (one animal per row) |
 | `data/covariates.csv` | CSV | Shared covariates (e.g., intercept, batch effects) |
@@ -184,51 +183,59 @@ For a full description of SLEMM parameters, see the
 
 ### Step 2: Fine-Mapping with BFMAP
 
-Candidate genomic regions are defined from GWAS hits and analyzed with BFMAP for Bayesian fine-mapping.
+Fine-mapping is run in four substeps. Candidate regions are first identified
+from GWAS hits (2a), a GRM is constructed for BFMAP (2b), heritability is
+estimated per trait (2c), and fine-mapping is performed per region (2d).
 
-**Edit paths** at the top of each R script.
+Edit paths at the top of each script before running.
 
+**2a: Identify candidate regions**
 ```bash
-# Step 2a — Define candidate regions from GWAS 
-Rscript 02a_identify_candidate_regions.R
-
-# Step 2b — Run BFMAP fine-mapping (one trait at a time, parallelise as needed)
-Rscript scripts/02b_finemapping_bfmap.R MilkYield
-Rscript scripts/02b_finemapping_bfmap.R FatYield
-# ... repeat for each trait, or loop:
-tail -n +2 config/traits.csv | cut -d, -f1 | \
-  xargs -P 4 -I{} Rscript scripts/02b_finemapping_bfmap.R {}
-
-# Step 2c — Aggregate fine-mapping results across all traits
-Rscript scripts/02c_summarise_finemapping.R
+Rscript scripts/02a_identify_candidate_regions.R
 ```
 
-**Key parameters in `02a_identify_candidate_regions.R`:**
-
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `p1` | 5e-7 | Primary significance threshold for lead SNP |
+| `p1` | 5e-7 | Primary significance threshold for lead variant |
 | `p2` | 5e-6 | Secondary threshold for counting supporting markers |
-| `scan` | 5,000,000 bp | Minimum gap to start a new region |
-| `window` | 1,000,000 bp | Flanking window around lead variant |
-| `min_markers2` | 3 | Minimum secondary markers to retain a region |
+| `scan` | 5,000,000 bp | Minimum gap to define a new region |
+| `min_sig_variants` | 1 | Minimum variants passing p1 to retain a region |
+| `min_secondary_variants` | 3 | Minimum variants passing p2 to retain a region |
 
-**Key parameters in `02b_finemapping_bfmap.R`:**
+Output: `<trait>_candidate_regions.csv`
+
+**2b: Construct BFMAP GRM**
+
+Note: the BFMAP GRM format is not compatible with MPH's GRM format. This step only needs to be run once per genotype dataset.
+```bash
+bash scripts/02b_construct_bfmap_grm.sh
+```
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `pv_sig` | 0.05 | P-value cutoff for SNP list supplied to BFMAP |
-| `min_markers2` | 3 | Minimum secondary markers to proceed with fine-mapping |
-| `MEFF` | 100 | BFMAP maximum number of causal variants |
-| `NUM_THREADS` | 15 | CPU threads for BFMAP |
+| `GRM_TYPE` | 2 | GRM type: 1 = centered, 2 = standardized |
 
-**Output:**
-- `results/finemapping/<trait>/<trait>.range` — candidate region coordinates
-- `results/finemapping/<trait>/<peak>.csv` — per-region BFMAP results (PIP per variant)
-- `results/finemapping/fmap_all_traits.csv` — aggregated fine-mapping table across all traits
+Output: `bfmap_grm.*`
 
----
+**2c: Estimate heritability**
+```bash
+bash scripts/02c_estimate_heritability.sh
+```
 
+Output: `<trait>.varcomp.csv`
+
+**2d: Fine-mapping**
+```bash
+bash scripts/02d_finemapping_bfmap.sh
+```
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `WINDOW` | 1,000,000 bp | Defines the candidate region as ±1 Mb around the top associated position for each significant GWAS peak |
+
+Output: per-region BFMAP results (`<region_id>.csv`) and region index (`<trait>.range.csv`) in `<trait>_bfmap/`.
+
+For a full description of BFMAP parameters, see the [BFMAP documentation](https://github.com/jiang18/bfmap).
 ### Step 3: Functional Enrichment with MPH
 
 Fine-mapped lead variants are used as fixed-effect covariates to condition out large-effect QTL signals before partitioning residual genetic variance across functional annotation categories with MPH MINQUE.
