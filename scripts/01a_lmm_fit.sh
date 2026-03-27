@@ -12,7 +12,7 @@ set -euo pipefail
 # User-defined inputs — edit this section before running
 # =============================================================================
 
-SLEMM="~/bin/slemm"               # Path to SLEMM executable
+SLEMM=~/bin/slemm               # Path to SLEMM executable
 TRAIT="MilkYield"                        # Trait name (must match column header in phenotype file)
 BFILE="/path_to_the_file/geno"           # Genotype file (PLINK binary prefix, SNPs only, QC-filtered)
 PHENO_FILE="/path_to_the_file/${TRAIT}.csv"  # Phenotype file: must contain columns IID and <trait>
@@ -28,8 +28,8 @@ NUM_QF_MARKERS=90
 # Optional: covariate file
 # Set COVAR_FILE to "" to skip; intercept is always included by default
 # If provided, list covariate column names in COVAR_NAMES (space-separated)
-COVAR_FILE="/path_to_the_file/covariates.csv"
-COVAR_NAMES="intercept"                  # e.g. "intercept batch sex"
+COVAR_FILE=""
+COVAR_NAMES=""                  # e.g. "intercept batch sex"
 
 # Optional: error weight
 # Set to "" to skip
