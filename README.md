@@ -29,42 +29,56 @@ Genotypes (SNPs / SVs, PLINK binary)
          │
          ▼
 ┌──────────────────────┐
-│  Step 1a             │  SLEMM --lmm
-│  LMM model fitting   │  Fit variance components per trait
+│  Step 1a             │  01a_lmm_fit.sh
+│  LMM model fitting   │  Fit variance components per trait with SLEMM --lmm
 └─────────┬────────────┘
           │
           ▼
 ┌──────────────────────┐
-│  Step 1b             │  slemm_gwa
-│  Association scan    │  Genome-wide association statistics
+│  Step 1b             │  01b_gwas_association.sh
+│  Association scan    │  Genome-wide association statistics with slemm_gwa
 └─────────┬────────────┘
           │
           ▼
 ┌──────────────────────┐
-│  Step 2a             │  R: identify_candidate_regions.R
-│  Candidate regions   │  Define fine-mapping windows from GWAS hits
+│  Step 2a             │  02a_identify_candidate_regions.R
+│  Candidate regions   │  Define candidate regions from GWAS hits
 └─────────┬────────────┘
           │
           ▼
 ┌──────────────────────┐
-│  Step 2b             │  BFMAP (Bayesian fine-mapping)
+│  Step 2b             │  02b_construct_bfmap_grm.sh
+│  Construct GRM       │  Build BFMAP GRM from model SNPs
+└─────────┬────────────┘
+          │
+          ▼
+┌──────────────────────┐
+│  Step 2c             │  02c_estimate_heritability.sh
+│  Heritability        │  Estimate h2 per trait with BFMAP
+└─────────┬────────────┘
+          │
+          ▼
+┌──────────────────────┐
+│  Step 2d             │  02d_finemapping_bfmap.sh
 │  Fine-mapping        │  Posterior inclusion probabilities (PIP) per variant
 └─────────┬────────────┘
           │
           ▼
 ┌──────────────────────┐
-│  Step 2c             │  R: summarise_finemapping.R 
-│  Summarise results   │  Aggregate PIPs across all traits and signals
+│  Step 2e             │  02e_summarise_finemapping.R
+│  Aggregate results   │  Aggregate BFMAP outputs into a single summary table
 └─────────┬────────────┘
           │
           ├─────────────────────────────────────┐
           ▼                                     ▼
 ┌──────────────────────┐           ┌──────────────────────┐
-│  Step 3a + 3b        │           │  Step 3c             │
-│  MPH MINQUE          │           │  GEMRICH             │
-│  Polygenic variance  │           │  Large-effect MLE    │
-│  partitioning across │           │  enrichment of fine- │
-│  annotation bins     │           │  mapped signals      │
+│  Step 3a             │           │  Step 3b + 3c        │
+│  GEMRICH             │           │  MPH MINQUE          │
+│  Large-effect MLE    │           │  Condition on fine-  │
+│  enrichment of fine- │           │  mapped effects;     │
+│  mapped signals      │           │  partition polygenic │
+│                      │           │  variance across     │
+│                      │           │  annotations         │
 └──────────────────────┘           └──────────────────────┘
 ```
 
