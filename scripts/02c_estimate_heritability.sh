@@ -12,15 +12,15 @@ set -euo pipefail
 # User-defined inputs — edit this section before running
 # =============================================================================
 
-BFMAP       =~/bin/bfmap                            # Path to BFMAP executable
+BFMAP=~/bin/bfmap                                 # Path to BFMAP executable
 
-TRAIT       ="MilkYield"                            # Trait name (must match column header in phenotype file)
+TRAIT="MilkYield"                                 # Trait name (must match column header in phenotype file)
 
-PHENO_FILE  ="/path_to_the_file/${TRAIT}.csv"       # Phenotype file
-GRM_FILE    ="/path_to_the_file/bfmap_grm"          # BFMAP GRM prefix (output from 02b)
-OUT_PREFIX  ="/path_to_the_file/${TRAIT}"           # Output file prefix (BFMAP appends .varcomp.csv etc.)
+PHENO_FILE="/path_to_the_file/${TRAIT}.csv"       # Phenotype file
+GRM_FILE="/path_to_the_file/bfmap_grm"            # BFMAP GRM prefix (output from 02b)
+OUT_PREFIX="/path_to_the_file/${TRAIT}"           # Output file prefix (BFMAP appends .varcomp.csv etc.)
 
-NUM_THREADS =10
+NUM_THREADS=10
 
 # =============================================================================
 
