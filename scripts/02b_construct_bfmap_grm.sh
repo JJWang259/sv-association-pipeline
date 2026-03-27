@@ -13,14 +13,14 @@ set -euo pipefail
 # User-defined inputs — edit this section before running
 # =============================================================================
 
-BFMAP        =~/bin/bfmap                          # Path to BFMAP executable
+BFMAP=~/bin/bfmap                          # Path to BFMAP executable
 
-GENO_FILE    ="/path_to_the_file/geno_model"          # PLINK binary prefix for model SNPs
-SNP_INFO     "/path_to_the_file/snp.info.csv"  # SNP info file (shared with SLEMM and MPH)
-OUT_PREFIX   "/path_to_the_file/bfmap_grm"         # Output GRM file prefix
+GENO_FILE="/path_to_the_file/geno_model"          # PLINK binary prefix for model SNPs
+SNP_INFO="/path_to_the_file/snp.info.csv"  # SNP info file (shared with SLEMM and MPH)
+OUT_PREFIX="/path_to_the_file/bfmap_grm"         # Output GRM file prefix
 
-GRM_TYPE     =2                                    # GRM type: 1 = centered, 2 = standardized
-NUM_THREADS  =10
+GRM_TYPE=2                                    # GRM type: 1 = centered, 2 = standardized
+NUM_THREADS=10
 
 # =============================================================================
 
