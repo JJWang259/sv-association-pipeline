@@ -14,38 +14,39 @@ set -euo pipefail
 
 SLEMM_GWA=~/bin/slemm_gwa                # Path to slemm_gwa executable
 
-TRAIT="MilkYield"                         # Trait name (must match 01a_lmm_fit.sh)
+TRAIT="MilkYield"                        # Trait name (must match 01a_lmm_fit.sh)
 
-BFILE="/path_to_the_file/geno_sv_snp"    # PLINK binary prefix for combined SNP+SV genotypes
+# Genotype file prefix for association testing
+# For per-chromosome files, use {CHR} as a placeholder for the chromosome number
+# Example: "/path/chr{CHR}.imputed" → /path/chr1.imputed, /path/chr2.imputed, ...
+# For a single merged file, simply provide the path with no {CHR} placeholder
+PFILE_TEMPLATE="/path_to_the_file/chr{CHR}.imputed"
+
 LMM_PREFIX="/path_to_the_file/${TRAIT}"  # Output prefix from 01a_lmm_fit.sh (without extension)
-
 NUM_CHROMOSOMES=29                        # Number of autosomes (cattle=29, pig=18)
-export OMP_NUM_THREADS=10
+export OMP_NUM_THREADS=20
 
-# Output
-OUT_DIR="/path_to_the_file/${TRAIT}"     # Directory for per-chromosome result files
-GWAS_OUT="/path_to_the_file/${TRAIT}_GWAS_All.txt"  # Concatenated GWAS summary file
+GWAS_OUT="/path_to_the_file/${TRAIT}_GWAS_All.txt" # Concatenated GWAS summary file
 
 # =============================================================================
 
+OUT_DIR="$(dirname "${GWAS_OUT}")"
 mkdir -p "${OUT_DIR}"
-
-# Check that LMM model file exists
-if [[ ! -f "${LMM_PREFIX}.qs" ]]; then
-    echo "[ERROR] LMM model not found: ${LMM_PREFIX}.qs"
-    echo "        Did you run 01a_lmm_fit.sh first?"
-    exit 1
-fi
 
 echo "[$(date)] Running GWAS for trait: ${TRAIT}"
 
 # Run per-chromosome association scan
 for i in $(seq 1 "${NUM_CHROMOSOMES}"); do
+    PFILE="${PFILE_TEMPLATE/\{CHR\}/${i}}"
+    OUT_FILE="${OUT_DIR}/${TRAIT}_gwa.chr${i}.txt"
+
     echo "  [$(date)] Chromosome ${i} / ${NUM_CHROMOSOMES}"
+    echo "    Using pfile: ${PFILE}"
+
     "${SLEMM_GWA}" \
-        --pfile  "${BFILE}" \
+        --pfile  "${PFILE}" \
         --slemm  "${LMM_PREFIX}" \
-        --out    "${OUT_DIR}/${TRAIT}_gwa.chr${i}.txt" \
+        --out    "${OUT_FILE}" \
         --chr    "${i}"
 done
 
