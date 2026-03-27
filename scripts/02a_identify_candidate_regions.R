@@ -11,9 +11,9 @@ library(data.table)
 # User-defined inputs — edit this section before running
 # =============================================================================
 
-TRAIT     <- "MilkYield"                               # Trait name
-GWAS_FILE <- "/path_to_the_file/${TRAIT}_GWAS.txt"   # GWAS summary statistics
-OUT_FILE  <- "/path_to_the_file/${TRAIT}_candidate_regions.csv" # Output summary table
+TRAIT     <- "MilkYield"                                          # Trait name
+GWAS_FILE <- paste0("/path_to_the_file/", TRAIT, "_GWAS.txt")    # GWAS summary statistics
+OUT_FILE  <- paste0("/path_to_the_file/", TRAIT, "_candidate_regions.csv")  # Output file
 
 # Column names in the GWAS file — adjust to match your software's output
 # Note: PLINK2 uses "#CHROM" as the chromosome column name. Although "#" looks
@@ -30,11 +30,11 @@ ID_COL    <- "ID"
 CHISQ_COL <- "CHISQ"    # column name for chi-square statistic
 
 # Region definition parameters
-p1                   <- 5e-7   # Primary significance threshold (lead variant cutoff)
-p2                   <- 5e-6   # Secondary threshold (for counting supporting markers)
-scan                 <- 5e6    # Minimum distance (bp) to define a new region
-min_sig_variants     <- 1      # Minimum variants passing p1 to retain a region
-min_secondary_variants <- 3    # Minimum variants passing p2 to retain a region
+p1                     <- 5e-7   # Primary significance threshold (lead variant cutoff)
+p2                     <- 5e-6   # Secondary threshold (for counting supporting markers)
+scan                   <- 5e6    # Minimum distance (bp) to define a new region
+min_sig_variants       <- 1      # Minimum variants passing p1 to retain a region
+min_secondary_variants <- 3      # Minimum variants passing p2 to retain a region
 
 # =============================================================================
 
@@ -42,24 +42,23 @@ min_secondary_variants <- 3    # Minimum variants passing p2 to retain a region
 # Function: identify_candidate_regions
 #
 # Arguments:
-#   gwas         - data.table of GWAS results (already loaded)
-#   trait        - trait name (used for peak name labelling)
-#   chr_col      - column name for chromosome
-#   pos_col      - column name for base-pair position
-#   p_col        - column name for p-value
-#   id_col       - column name for variant ID
-#   chisq_col    - column name for chi-square statistic (pre-compute as (b/se)^2 for GCTA)
-#   p1           - primary significance threshold for lead variant
-#   p2           - secondary threshold for counting supporting markers
+#   gwas                   - data.table of GWAS results (already loaded)
+#   trait                  - trait name (used for region_id labelling)
+#   chr_col                - column name for chromosome
+#   pos_col                - column name for base-pair position
+#   p_col                  - column name for p-value
+#   id_col                 - column name for variant ID
+#   chisq_col              - column name for chi-square statistic (pre-compute as (b/se)^2 for GCTA)
+#   p1                     - primary significance threshold for lead variant
+#   p2                     - secondary threshold for counting supporting markers
 #   scan                   - minimum gap (bp) between independent regions
 #   min_sig_variants       - minimum variants passing p1 to retain a region (default: 1)
 #   min_secondary_variants - minimum variants passing p2 to retain a region (default: 3)
 #
 # Returns:
 #   data.table of candidate regions, or NULL if none found
-#   Peak names are formatted as <trait>_<chr>:<lead_pos>
-#   leadSNP and leadPOS columns contain all significant variants in the block
-#   separated by ";" — used downstream to define fine-mapping boundaries
+#   region_id is formatted as <trait>_<chr>:<lead_pos>
+#   lead_variant and lead_pos are ";" separated if multiple variants share max CHISQ
 # -----------------------------------------------------------------------------
 identify_candidate_regions <- function(gwas, trait,
                                        chr_col                = "#CHROM",
@@ -75,7 +74,7 @@ identify_candidate_regions <- function(gwas, trait,
 
     # ── Validate columns ──────────────────────────────────────────────────────
     required_cols <- c(chr_col, pos_col, p_col, id_col, chisq_col)
-    missing_cols <- setdiff(required_cols, names(gwas))
+    missing_cols  <- setdiff(required_cols, names(gwas))
     if (length(missing_cols) > 0)
         stop(sprintf("Column(s) not found in GWAS file: %s\nAvailable columns: %s",
                      paste(missing_cols, collapse = ", "),
@@ -91,19 +90,22 @@ identify_candidate_regions <- function(gwas, trait,
     # Helper: given a block of significant variants, build one region row
     make_row <- function(blk, full_chr, i, trait, p2) {
         # Lead variant: highest CHISQ; ";" separated if multiple variants share the maximum
-        lead_idx  <- which(blk$CHISQ == max(blk$CHISQ))
-        lead_pos  <- blk$POS[lead_idx]
+        lead_idx <- which(blk$CHISQ == max(blk$CHISQ))
+        lead_pos <- blk$POS[lead_idx]
+
+        # Count secondary variants within 1 Mb around the block boundaries
+        region <- full_chr[POS >= min(blk$POS[lead_idx]) - 1000000 & POS <= max(blk$POS[lead_idx]) + 1000000]
 
         data.table(
             chr                  = i,
             region_start         = min(blk$POS),
             region_end           = max(blk$POS),
             region_range_bp      = max(blk$POS) - min(blk$POS),
-            lead_variant         = paste(blk$ID[lead_idx],  collapse = ";"),
-            lead_pos             = paste(lead_pos,           collapse = ";"),
+            lead_variant         = paste(blk$ID[lead_idx], collapse = ";"),
+            lead_pos             = paste(lead_pos,          collapse = ";"),
             region_id            = paste0(trait, "_", i, ":", lead_pos[1]),
             n_sig_variants       = nrow(blk),
-            n_secondary_variants = nrow(full_chr[P <= p2])
+            n_secondary_variants = nrow(region[P <= p2])
         )
     }
 
@@ -114,6 +116,7 @@ identify_candidate_regions <- function(gwas, trait,
         gwa      <- full_chr[P <= p1]
         if (nrow(gwa) == 0) next
 
+        # Assign each significant variant to a block based on scan distance
         gaps     <- c(0, diff(gwa$POS)) > scan
         block_id <- cumsum(gaps)
 
@@ -159,7 +162,7 @@ result <- identify_candidate_regions(
 
 # Save output
 if (is.null(result) || nrow(result) == 0) {
-    cat(sprintf("  No significant regions found for trait: %s\n", TRAIT))
+    cat(sprintf("  No candidate regions found for trait: %s\n", TRAIT))
 } else {
     dir.create(dirname(OUT_FILE), recursive = TRUE, showWarnings = FALSE)
     fwrite(result, OUT_FILE, sep = ",", quote = FALSE, row.names = FALSE)
