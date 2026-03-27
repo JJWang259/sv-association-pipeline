@@ -13,7 +13,7 @@ library(data.table)
 
 TRAIT     <- "MilkYield"                               # Trait name
 GWAS_FILE <- "/path_to_the_file/MilkYield_GWAS.txt"   # GWAS summary statistics
-OUT_FILE  <- "/path_to_the_file/MilkYield_summary.csv" # Output summary table
+OUT_FILE  <- "/path_to_the_file/MilkYield_candidate_regions.csv" # Output summary table
 
 # Column names in the GWAS file — adjust to match your software's output
 # Note: PLINK2 uses "#CHROM" as the chromosome column name. Although "#" looks
