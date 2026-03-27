@@ -20,7 +20,7 @@ TRAIT="MilkYield"                        # Trait name (must match 01a_lmm_fit.sh
 # For per-chromosome files, use {CHR} as a placeholder for the chromosome number
 # Example: "/path/chr{CHR}.imputed" → /path/chr1.imputed, /path/chr2.imputed, ...
 # For a single merged file, simply provide the path with no {CHR} placeholder
-PFILE_TEMPLATE="/path_to_the_file/chr{CHR}.imputed"
+GENO_TEST_TEMPLATE="/path_to_the_file/chr{CHR}.imputed"
 
 LMM_PREFIX="/path_to_the_file/${TRAIT}"  # Output prefix from 01a_lmm_fit.sh (without extension)
 NUM_CHROMOSOMES=29                        # Number of autosomes (cattle=29, pig=18)
@@ -37,14 +37,14 @@ echo "[$(date)] Running GWAS for trait: ${TRAIT}"
 
 # Run per-chromosome association scan
 for i in $(seq 1 "${NUM_CHROMOSOMES}"); do
-    PFILE="${PFILE_TEMPLATE/\{CHR\}/${i}}"
+    GENO_TEST="${GENO_TEST_TEMPLATE/\{CHR\}/${i}}"
     OUT_FILE="${OUT_DIR}/${TRAIT}_gwa.chr${i}.txt"
 
     echo "  [$(date)] Chromosome ${i} / ${NUM_CHROMOSOMES}"
-    echo "    Using pfile: ${PFILE}"
+    echo "    Using pfile: ${GENO_TEST}"
 
     "${SLEMM_GWA}" \
-        --pfile  "${PFILE}" \
+        --pfile  "${GENO_TEST}" \
         --slemm  "${LMM_PREFIX}" \
         --out    "${OUT_FILE}" \
         --chr    "${i}"
