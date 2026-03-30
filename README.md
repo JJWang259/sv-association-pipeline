@@ -197,9 +197,10 @@ For a full description of SLEMM parameters, see the
 
 ### Step 2: Fine-Mapping with BFMAP
 
-Fine-mapping is run in four substeps. Candidate regions are first identified
+Fine-mapping is run in five substeps. Candidate regions are first identified
 from GWAS hits (2a), a GRM is constructed for BFMAP (2b), heritability is
-estimated per trait (2c), and fine-mapping is performed per region (2d).
+estimated per trait (2c), fine-mapping is performed per region (2d), and
+results are aggregated into a single summary table (2e).
 
 Edit paths at the top of each script before running.
 
@@ -250,7 +251,16 @@ bash scripts/02d_finemapping_bfmap.sh
 Output: per-region BFMAP results (`<region_id>.csv`) and region index (`<trait>.range.csv`) in `<trait>_bfmap/`.
 
 For a full description of BFMAP parameters, see the [BFMAP documentation](https://github.com/jiang18/bfmap).
-### Step 3: Functional Enrichment with MPH
+
+**2e: Aggregate fine-mapping results**
+```bash
+Rscript scripts/02e_summarise_finemapping.R
+```
+
+Aggregates BFMAP outputs across one or more traits into a single deduplicated
+summary table. Edit `TRAIT_LIST` to specify which traits to include.
+
+### Step 3: Functional Enrichment
 
 Fine-mapped lead variants are used as fixed-effect covariates to condition out large-effect QTL signals before partitioning residual genetic variance across functional annotation categories with MPH MINQUE.
 
