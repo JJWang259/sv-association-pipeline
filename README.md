@@ -15,7 +15,7 @@ The pipeline covers three steps: **genome-wide association studies (GWAS)**, **B
 - [Pipeline Steps](#pipeline-steps)
   - [Step 1: GWAS with SLEMM](#step-1-gwas-with-slemm)
   - [Step 2: Fine-Mapping with BFMAP](#step-2-fine-mapping-with-bfmap)
-  - [Step 3: Functional Enrichment with MPH](#step-3-functional-enrichment-with-mph)
+  - [Step 3: Functional Enrichment](#step-3-functional-enrichment)
 - [Output Files](#output-files)
 - [Publications](#publications)
 - [Contact](#contact)
