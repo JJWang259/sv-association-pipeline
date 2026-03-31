@@ -37,7 +37,7 @@ CATEGORY_LIST <- c("SV", "CDS", "UTR", "promoter", "intron")
 
 # Output file prefix — default: <GROUP_NAME>.pv<PV_THRESHOLD> in current directory
 # Change to a full path to write outputs elsewhere, e.g. "/path/gemrich/Production.pv5e-5"
-OUT_PREFIX <- paste0(GROUP_NAME, ".pv", PV_THRESHOLD)
+OUT_PREFIX <- paste0(GROUP_NAME, ".", PV_THRESHOLD)
 
 # =============================================================================
 
