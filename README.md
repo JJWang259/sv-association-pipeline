@@ -292,7 +292,9 @@ large-effect signals across functional annotation categories.
 Rscript scripts/03a_gemrich_enrichment.R
 ```
 
-Output: `<group>.<pv>.enrichment.csv`
+Output: `<group>.<pv>.enrichment.csv`, `.mle.csv`, `.var.csv`, `.logll.csv`, `.counts.csv`
+
+For a full description of GEMRICH functions and usage, see the [GEMRICH documentation](https://github.com/jiang18/gemrich).
 
 ---
 
@@ -329,7 +331,8 @@ bash scripts/03d_run_mph.sh
 
 Output: `<trait>.mph.mq.*`
 
-See the [MPH documentation](https://github.com/jiang18/mph) for details on variance component output interpretation.
+For a full description of MPH parameters and variance component output interpretation, see the [MPH documentation](https://jiang18.github.io/mph/).
+
 ---
 
 ## Output Files
