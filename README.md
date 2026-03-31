@@ -371,7 +371,7 @@ Department of Animal Science, North Carolina State University
 📧 jwang259@ncsu.edu  
 🔗 [jjwang259.github.io](https://jjwang259.github.io/)
 
-**Jicai Jiang**
+**Jicai Jiang**  
 Department of Animal Science, North Carolina State University  
 📧 jicai_jiang@ncsu.edu  
 🔗 [cals.ncsu.edu/animal-science/people/jicai-jiang](https://cals.ncsu.edu/animal-science/people/jicai-jiang/)
