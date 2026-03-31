@@ -91,17 +91,17 @@ Genotypes (SNPs / SVs, PLINK binary), phenotypes, and annotation files
 sv-association-pipeline/
 ├── README.md
 └── scripts/
-├── 01a_lmm_fit.sh                    # Step 1a: LMM model fitting (SLEMM)
-├── 01b_gwas_association.sh           # Step 1b: GWAS (slemm_gwa)
-├── 02a_identify_candidate_regions.R  # Step 2a: Define candidate regions
-├── 02b_construct_bfmap_grm.sh        # Step 2b: Construct BFMAP GRM
-├── 02c_estimate_heritability.sh      # Step 2c: Estimate heritability with BFMAP
-├── 02d_finemapping_bfmap.sh          # Step 2d: BFMAP forward selection fine-mapping
-├── 02e_summarise_finemapping.R       # Step 2e: Aggregate fine-mapping results
-├── 03a_gemrich_enrichment.R          # Step 3a: GEMRICH large-effect enrichment
-├── 03b_prepare_mph_covariates.R      # Step 3b: Extract lead-variant covariates
-├── 03c_construct_mph_grms.sh         # Step 3c: Construct partitioned GRMs for MPH
-└── 03d_run_mph.sh                    # Step 3d: MPH MINQUE variance partitioning
+    ├── 01a_lmm_fit.sh                    # Step 1a: LMM model fitting (SLEMM)
+    ├── 01b_gwas_association.sh           # Step 1b: GWAS (slemm_gwa)
+    ├── 02a_identify_candidate_regions.R  # Step 2a: Define candidate regions
+    ├── 02b_construct_bfmap_grm.sh        # Step 2b: Construct BFMAP GRM
+    ├── 02c_estimate_heritability.sh      # Step 2c: Estimate heritability with BFMAP
+    ├── 02d_finemapping_bfmap.sh          # Step 2d: BFMAP forward selection fine-mapping
+    ├── 02e_summarise_finemapping.R       # Step 2e: Aggregate fine-mapping results
+    ├── 03a_gemrich_enrichment.R          # Step 3a: GEMRICH large-effect enrichment
+    ├── 03b_prepare_mph_covariates.R      # Step 3b: Extract lead-variant covariates
+    ├── 03c_construct_mph_grms.sh         # Step 3c: Construct partitioned GRMs for MPH
+    └── 03d_run_mph.sh                    # Step 3d: MPH MINQUE variance partitioning
 ```
 
 ---
