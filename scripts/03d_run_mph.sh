@@ -29,6 +29,10 @@ OUT_PREFIX="/path_to_the_file/${TRAIT}.mph"        # Output file prefix
 
 NUM_THREADS=20
 
+# Optional: reliability/error weight column name in PHENO_FILE
+# Set to "" to skip
+ERROR_WEIGHT_NAME=""                               # e.g. "reliability" or "R-MilkYield"
+
 # =============================================================================
 
 mkdir -p "$(dirname "${OUT_PREFIX}")"
@@ -43,6 +47,12 @@ else
     echo "  No covariate file — running without fixed effects"
 fi
 
+# Build optional error weight argument
+ERROR_ARGS=""
+if [[ -n "${ERROR_WEIGHT_NAME}" ]]; then
+    ERROR_ARGS="--error_weight ${ERROR_WEIGHT_NAME}"
+fi
+
 /usr/bin/time -v "${MPH}" \
     --minque \
     --save_mem \
@@ -52,6 +62,7 @@ fi
     --num_threads "${NUM_THREADS}" \
     --out         "${OUT_PREFIX}" \
     ${COV_ARGS} \
+    ${ERROR_ARGS} \
     > "${OUT_PREFIX}.log" 2> "${OUT_PREFIX}.time"
 
-echo "[$(date)] MPH MINQUE complete: ${OUT_PREFIX}.vc"
+echo "[$(date)] MPH MINQUE complete: ${OUT_PREFIX}.*"
