@@ -4,8 +4,8 @@
 # Also generates grm_list.txt for use in 03d_run_mph.sh
 # Dependencies: PLINK, MPH
 # Author: Junjian Wang
-# Initiate date: 03/24/2026
-# Current date: 03/24/2026
+# Initiate date: 02/12/2026
+# Current date: 03/31/2026
 # =============================================================================
 
 set -euo pipefail
@@ -17,12 +17,12 @@ set -euo pipefail
 PLINK="plink"
 MPH="$HOME/bin/mph"
 
-GENO_FILE="/path_to_the_file/geno_test"    # PLINK binary prefix (same genotypes used in GWAS)
-SNP_INFO="/path_to_the_file/snp.info.csv"  # SNP info CSV: first column SNP ID,
-                                            # remaining columns define annotation partitions
-OUT_DIR="/path_to_the_file/grms"           # Output directory for GRM files
+GENO_FILE="/path_to_the_file/geno_test"            # PLINK binary prefix (same genotypes used in GWAS)
+SNP_INFO="/path_to_the_file/snp.info.annot.csv"    # SNP info CSV: first column SNP ID,
+                                                   # remaining columns define annotation partitions
+OUT_DIR="/path_to_the_file/grms"                   # Output directory for GRM files
 
-NUM_AUTOSOMES=29                            # Number of autosomes (cattle=29, pig=18)
+NUM_AUTOSOMES=29                                   # Number of autosomes (cattle=29, pig=18)
 NUM_THREADS=20
 
 # =============================================================================
