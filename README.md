@@ -164,7 +164,7 @@ in SLEMM and GRM construction in BFMAP. No header required.
 1_689_ACCTG
 ```
 
-### Annotation file format (`snp.info.annot.csv`)
+### Annotation file format for MPH (`snp.info.annot.csv`)
 
 One row per SNP, one column per annotation partition. SNPs belonging to a partition have value `1`; all other cells are empty.
 
@@ -174,6 +174,9 @@ rs123,,1,,...
 rs456,1,,,...
 ```
 ### SNP list file for GEMRICH (`snplist.csv`)
+
+A two-column CSV containing all genotyped SNPs, used to compute background
+annotation category proportions for GEMRICH enrichment analysis.
 
 ```
 chr,pos
