@@ -1,6 +1,6 @@
 # Genomics Association Pipeline
 
-A collection of R and Bash scripts for large-scale genotype-phenotype association analysis, implementing the analytical framework used across multiple livestock genomics studies (see [Publications](#publications)).
+A collection of R and Bash scripts for large-scale structural variant (SV) and SNP association analysis, implementing the analytical framework used across multiple livestock genomics studies (see [Publications](#publications)).
 
 The pipeline covers three steps: **genome-wide association studies (GWAS)**, **Bayesian fine-mapping**, and **functional enrichment analysis**. Originally developed for genetic variant association analyses in farm animals, the
 framework may also be applicable to other populations with individual-level genotype and phenotype data.
@@ -88,7 +88,7 @@ Genotypes (SNPs / SVs, PLINK binary), phenotypes, and annotation files
 ## Repository Structure
 
 ```
-genomics-association-pipeline/
+sv-association-pipeline/
 ├── README.md
 └── scripts/
 ├── 01a_lmm_fit.sh                    # Step 1a: LMM model fitting (SLEMM)
