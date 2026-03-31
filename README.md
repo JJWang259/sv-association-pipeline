@@ -26,7 +26,7 @@ framework may also be applicable to other populations with individual-level geno
 ## Overview
 
 ```
-Genotypes (SNPs / SVs, PLINK binary)
+Genotypes (SNPs / SVs, PLINK binary), phenotypes, and annotation files
          │
          ▼
 ┌──────────────────────┐
@@ -92,7 +92,7 @@ genomics-association-pipeline/
 ├── README.md
 └── scripts/
 ├── 01a_lmm_fit.sh                    # Step 1a: LMM model fitting (SLEMM)
-├── 01b_gwas_association.sh           # Step 1b: Chromosome-wise GWAS scan
+├── 01b_gwas_association.sh           # Step 1b: GWAS (slemm_gwa)
 ├── 02a_identify_candidate_regions.R  # Step 2a: Define candidate regions
 ├── 02b_construct_bfmap_grm.sh        # Step 2b: Construct BFMAP GRM
 ├── 02c_estimate_heritability.sh      # Step 2c: Estimate heritability with BFMAP
@@ -133,8 +133,6 @@ devtools::install_github("jiang18/gemrich")
 
 ### Required files
 
-### Required files
-
 | File | Format | Description |
 |------|--------|-------------|
 | `geno_model.*` | PLINK binary | Model SNP genotypes for LMM fitting and BFMAP GRM construction |
@@ -154,7 +152,28 @@ HO123457,1.120,0.91
 
 The reliability column is optional. If included, specify its column name in `ERROR_WEIGHT_NAME` in `01a_lmm_fit.sh`, `02c_estimate_heritability.sh`, `02d_finemapping_bfmap.sh`, and `03d_run_mph.sh`.
 
-### SNP list file for GEMRICH (`dsnplist.csv`)
+
+
+### SNP info file format (`snp.info.csv`)
+
+A single-column CSV listing SNP IDs used for variance component estimation
+in SLEMM and GRM construction in BFMAP. No header required.
+```
+1_112_C
+1_370_G
+1_689_ACCTG
+```
+
+### Annotation file format (`snp.info.annot.csv`)
+
+One row per SNP, one column per annotation partition. SNPs belonging to a partition have value `1`; all other cells are empty.
+
+```
+SNP,V1,V2,V3,...
+rs123,,1,,...
+rs456,1,,,...
+```
+### SNP list file for GEMRICH (`snplist.csv`)
 
 ```
 chr,pos
@@ -165,17 +184,6 @@ chr,pos
 Generate from PLINK1 BIM: `awk '{print $1","$4}' geno.bim | sed '1s/^/chr,pos\n/' > snplist.csv`
 
 Generate from PLINK2 PVAR: `awk 'NR>1 {print $1","$2}' geno.pvar | sed '1s/^/chr,pos\n/' > snplist.csv`
-
-
-### Annotation file format (`snp.info.annot.csv`)
-
-One row per SNP, one column per annotation category. Cell values are category labels.
-
-```
-SNP,V1,V2,V3,...
-rs123,1,0,1,...
-rs456,0,1,0,...
-```
 
 ---
 
@@ -262,6 +270,8 @@ Rscript scripts/02e_summarise_finemapping.R
 ```
 Aggregates BFMAP outputs across one or more traits into a single summary table.
 
+Output: `fmap_all.csv`
+
 ### Step 3: Functional Enrichment
 
 Two complementary analyses are performed using the aggregated fine-mapping
@@ -277,9 +287,11 @@ large-effect QTL contributions.
 
 GEMRICH applies an MLE-based model to estimate enrichment of fine-mapped
 large-effect signals across functional annotation categories.
+
 ```bash
 Rscript scripts/03a_gemrich_enrichment.R
 ```
+
 Output: `<group>.<pv>.enrichment.csv`
 
 ---
@@ -345,7 +357,7 @@ This pipeline was developed for and used in the following studies. If you find i
 Please also cite the underlying tools:
 
 - **SLEMM:** Cheng J, et al. (2023). *Bioinformatics*, 39(4). https://doi.org/10.1093/bioinformatics/btad127
-- **BFMAP:** Jiang J, et al. (2019). *Communications Biology*, 2, 212. https://doi.org/10.1038/s42003-019-0454-y
+- **BFMAP:** Jiang J, et al. (2019). *Communications Biology*, 2, 212. https://doi.org/10.1038/s42003-019-0454-y; Wang J, et al. (2025). *Briefings in Bioinformatics*, 26(6). https://doi.org/10.1093/bib/bbaf614
 - **MPH:** Jiang J. (2024). *Bioinformatics*, 40(5). https://doi.org/10.1093/bioinformatics/btae298
 - **GEMRICH:** Jiang J. https://github.com/jiang18/gemrich
 - **PLINK:** Chang CC, et al. (2015). *GigaScience*, 4(1). https://doi.org/10.1186/s13742-015-0047-8
@@ -357,6 +369,11 @@ Please also cite the underlying tools:
 **Junjian Wang**  
 Department of Animal Science, North Carolina State University  
 📧 jwang259@ncsu.edu  
-🔗 https://github.com/JJWang259
+🔗 [jjwang259.github.io](https://jjwang259.github.io/)
+
+**Jicai Jiang**
+Department of Animal Science, North Carolina State University  
+📧 jicai_jiang@ncsu.edu  
+🔗 [cals.ncsu.edu/animal-science/people/jicai-jiang](https://cals.ncsu.edu/animal-science/people/jicai-jiang/)
 
 For bug reports or questions, please open an [Issue](https://github.com/JJWang259/sv-association-pipeline/issues).
