@@ -1,4 +1,4 @@
-# Genomics Association Pipeline
+# SV Association Pipeline
 
 A collection of R and Bash scripts for large-scale structural variant (SV) and SNP association analysis, implementing the analytical framework used across multiple livestock genomics studies (see [Publications](#publications)).
 
