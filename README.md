@@ -101,7 +101,10 @@ sv-association-pipeline/
     ├── 03a_gemrich_enrichment.R          # Step 3a: GEMRICH large-effect enrichment
     ├── 03b_prepare_mph_covariates.R      # Step 3b: Extract lead-variant covariates
     ├── 03c_construct_mph_grms.sh         # Step 3c: Construct partitioned GRMs for MPH
-    └── 03d_run_mph.sh                    # Step 3d: MPH MINQUE variance partitioning
+    ├── 03d_run_mph.sh                          # Step 3d: MPH MINQUE variance partitioning
+    ├── 04a_extract_genotype_covariate.R        # Step 4a: Extract genotype covariates (optional)
+    ├── 04b_construct_grm_variant_effect.sh     # Step 4b: Construct GRM for variant effect (optional)
+    └── 04c_estimate_variant_effect.sh          # Step 4c: Estimate variant-specific effects (optional)
 ```
 
 ---
@@ -150,7 +153,9 @@ HO123456,0.312,0.85
 HO123457,1.120,0.91
 ```
 
-The reliability column is optional. If included, specify its column name in `ERROR_WEIGHT_NAME` in `01a_lmm_fit.sh`, `02c_estimate_heritability.sh`, `02d_finemapping_bfmap.sh`, and `03d_run_mph.sh`.
+The reliability column is optional. If included, specify its column name in
+`ERROR_WEIGHT_NAME` in `01a_lmm_fit.sh`, `02c_estimate_heritability.sh`,
+`02d_finemapping_bfmap.sh`, `03d_run_mph.sh`, and `04c_estimate_variant_effect.sh`.
 
 
 
@@ -338,16 +343,58 @@ For a full description of MPH parameters and variance component output interpret
 
 ---
 
+### Step 4: Variant Effect Estimation (Optional)
+
+This optional step estimates genotype-specific effects of a candidate variant on complex traits using MPH, with AA and BB dummy variable covariates and heterozygous (AB) as baseline. This allows estimation of additive and dominance effects beyond a standard additive model. The step is typically run after identifying variants of interest from fine-mapping or enrichment results.
+
+Note: A_allele is the minor allele (PLINK1) or reference allele (PLINK2); B_allele is the major allele (PLINK1) or alternative allele (PLINK2). AA and BB coefficients estimate genotype-specific effects relative to heterozygous (AB) as baseline.
+
+**4a: Extract genotype covariates**
+
+```bash
+Rscript scripts/04a_extract_genotype_covariate.R
+```
+
+Output: `<variant>.covariate.csv` and `<variant>.allele_coding.csv`
+
+**4b: Construct GRM**
+
+Constructs a single whole-genome GRM from model SNPs for MPH. This step only needs to be run once per genotype dataset.
+
+```bash
+bash scripts/04b_construct_grm_variant_effect.sh
+```
+
+Output: `mph_grm.*`
+
+**4c: Estimate variant effect**
+
+```bash
+bash scripts/04c_estimate_variant_effect.sh
+```
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `VARIANT` | — | Variant ID (must match 04a output) |
+| `TRAIT` | — | Trait name |
+| `ERROR_WEIGHT_NAME` | `""` | Reliability column in phenotype file; set to `""` to skip |
+
+Output: `<trait>.<variant>.mq.*`
+
+---
+
 ## Output Files
 
 | File | Description |
 |------|-------------|
-| `<trait>_GWAS_All.txt` | Full GWAS summary statistics from 01b |
-| `<trait>_candidate_regions.csv` | Candidate region table from 02a |
-| `<trait>_bfmap/<region_id>.csv` | Per-region BFMAP output (PIP per variant) from 02d |
-| `fmap_all.csv` | Aggregated fine-mapping results from 02e |
-| `<group>.<pv>.enrichment.csv` | GEMRICH enrichment estimates from 03a |
-| `<trait>.mph.mq.vc.csv` | MPH variance component estimates per annotation from 03d|
+| `<trait>_GWAS_All.txt` | Full GWAS summary statistics (01b) |
+| `<trait>_candidate_regions.csv` | Candidate regions identified from GWAS significant peaks (02a) |
+| `<trait>_bfmap/<region_id>.csv` | Per-region BFMAP fine-mapping results with PIP per variant (02d) |
+| `fmap_all.csv` | Aggregated fine-mapping summary across traits (02e) |
+| `<group>.<pv>.enrichment.csv` | GEMRICH enrichment estimates across annotation categories (03a) |
+| `<trait>.mph.mq.vc.csv` | MPH variance component estimates per annotation (03d) |
+| `<variant>.allele_coding.csv` | Allele identity, frequency, and HWE p-value for the variant (04a) |
+| `<trait>.<variant>.mq.blue.csv` | MPH variant effect estimates (04c) |
 
 ---
 
