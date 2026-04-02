@@ -17,6 +17,7 @@ framework may also be applicable to other populations with individual-level geno
   - [Step 1: GWAS with SLEMM](#step-1-gwas-with-slemm)
   - [Step 2: Fine-Mapping with BFMAP](#step-2-fine-mapping-with-bfmap)
   - [Step 3: Functional Enrichment](#step-3-functional-enrichment)
+  - [Step 4: Variant Effect Estimation (Optional)](#step-4-variant-effect-estimation-optional)
 - [Output Files](#output-files)
 - [Publications](#publications)
 - [Contact](#contact)
@@ -81,6 +82,15 @@ Genotypes (SNPs / SVs, PLINK binary), phenotypes, and annotation files
 │                      │           │  variance across     │
 │                      │           │  annotations         │
 └──────────────────────┘           └──────────────────────┘
+
+          (optional)
+          ▼
+┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┐
+│  Step 4a + 4b + 4c │  04a/04b/04c
+│  Variant effect    │  Estimate genotype-specific effects
+│  estimation        │  of a candidate variant with MPH
+└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┘
+
 ```
 
 ---
